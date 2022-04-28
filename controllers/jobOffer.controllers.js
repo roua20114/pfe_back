@@ -1,4 +1,7 @@
 const Offer = require("../models/jobOffer.models");
+require ('dotenv').config
+const fileUploadmiddleware=require('../middleware/fileUpload')
+
 
 
 exports.add = async (req, res) => {
@@ -6,6 +9,8 @@ exports.add = async (req, res) => {
         return res.status(400).send({ message: "Error occured" })
     }
     console.log(req.file)
+   
+    
     const offer = new Offer({
         title: req.body.title,
         description: req.body.description,
@@ -17,6 +22,7 @@ exports.add = async (req, res) => {
         diplomaReq: req.body.diplomaReq,
         placesAvai: req.body.placesAvai,
         fields: req.body.fields,
+        logo:req.file
 
     });
     await offer.save().then(data => { res.send(data) })
@@ -24,9 +30,9 @@ exports.add = async (req, res) => {
 };
 exports.findAllOffers = (req, res) => {
 
-    let query = req.body.fields == '' ? {} : { fields: req.body.fields }
+   
 
-    Offer.find(query)
+    Offer.find()
     .populate('fields')
     .then(offers => {
         res.send(offers);
@@ -39,7 +45,7 @@ exports.findAllOffers = (req, res) => {
 exports.findById = (req, res) => {
     Offer.findById(req.params.id).then((offer) => {
         if (!offer) {
-            return res.status(404).send({ message: "coudln't find Field" })
+            return res.status(404).send({ message: "coudln't find offer" })
         }
         res.send(offer)
 
@@ -94,6 +100,7 @@ exports.update = (req, res) => {
     })
 
 }
-exports.findOfferbyField = (req, res) => {
+exports.findOfferbyFieldId = (req, res) => {
+   
 
 }

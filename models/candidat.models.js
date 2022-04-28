@@ -24,10 +24,14 @@ const candidatSchema= mongoose.Schema({
         type:Date,
         required: true
     },
+    comment:[{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:'Comments'
+    }]
    
   
     
 
 });
-//const candidat= 
+
 module.exports= user.discriminator("Candidat",candidatSchema)

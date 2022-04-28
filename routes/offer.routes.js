@@ -1,13 +1,14 @@
 const express=require('express');
 const router= express.Router();
-const multer=require('multer')
-const upload=multer({dest:'uploads/'})
+
+const middleware=require('../middleware/fileUpload')
 const verifyToken=require("../routes/verifyToken")
 const offerCtr=require('../controllers/jobOffer.controllers');
-router.post('/addOffer',offerCtr.add);
+router.post('/addOffer',offerCtr.add,middleware.upload.single('file'));
 router.get('/getAll',offerCtr.findAllOffers);
 router.get('/:id',offerCtr.findById);
 router.delete('/:id',verifyToken.verifyToken,offerCtr.delete);
-router.put('/:id',verifyToken.verifyToken,offerCtr.update);
+router.put('/:id',offerCtr.update);
+
 
 module.exports=router;

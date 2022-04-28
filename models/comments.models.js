@@ -11,6 +11,14 @@ const comentsSchema=mongoose.Schema({
     offer:{
         type:mongoose.Schema.Types.ObjectId,
         ref:"Offer"
+    },
+    candidat:{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:"Candidat"
+    },
+    company:{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:"compnayRes"
     }
 });
    

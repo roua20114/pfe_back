@@ -39,9 +39,13 @@ const companyResSchema= mongoose.Schema({
     type:{
         type: String,
         required: true
-    }
+    },
+    comments:[{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:'Comments'
+    }]
     
 });
-//const companyRes= user.discriminator("companyRes",companyResSchema)
+
 
 module.exports= user.discriminator("companyRes",companyResSchema)
