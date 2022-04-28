@@ -43,7 +43,7 @@ const UserSchema= new mongoose.Schema({
     },
     emailToken:{
         type:String
-    }
+    },
   
 },
     {timestamps:true}

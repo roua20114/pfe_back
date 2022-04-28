@@ -5,8 +5,8 @@ const mongoose=require('mongoose')
 const dotenv=require('dotenv')
 const bodyParser=require('body-parser')
 
-const cors=require('cors')
 
+const cors= require('cors')
 const userRoute=require('./routes/user.routes')
 const fieldRouters=require('./routes/field.routes');
 const comRouters=require('./routes/comments.routes');
@@ -34,7 +34,7 @@ app.use((req, res, next) => {
 app.use(express.json());
 app.use(bodyParser.urlencoded({extended:false}));
 app.use(bodyParser.json());
-
+app.use(cors())
 
 app.use('/api/auth',authRoute)
 app.use('/api/user',userRoute)

@@ -7,6 +7,7 @@ exports.createCom= async(req,res)=>{
     const coments= new Comments({
         id:req.body.id,
         content:req.body.content,
+        offer:req.body.offer
         
 
     });
@@ -57,7 +58,8 @@ exports.update=(req,res)=>{
     }
     Comments.findByIdAndUpdate(req.params.id,{
         id:req.body.id,
-        content:req.body.content
+        content:req.body.content,
+        
 
     }).then(coments=>{
         if(!coments){

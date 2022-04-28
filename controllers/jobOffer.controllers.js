@@ -1,6 +1,6 @@
 const Offer = require("../models/jobOffer.models");
-const multer = require('multer')
-const upload = multer({ dest: 'uploads/' })
+
+
 exports.add = async (req, res) => {
     if (!req.body) {
         return res.status(400).send({ message: "Error occured" })

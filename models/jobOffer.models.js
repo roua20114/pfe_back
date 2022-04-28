@@ -58,6 +58,11 @@ const offerSchema= mongoose.Schema({
     company:[{
         type:mongoose.Schema.Types.ObjectId,
         ref:"CompanyRes"
+    }],
+    comments:[{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:"Comments"
+        
     }]
         
     
