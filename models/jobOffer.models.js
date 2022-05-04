@@ -42,9 +42,7 @@ const offerSchema= mongoose.Schema({
         type: Number,
         required: true
     },
-    logo:{
-        type:String
-    },
+    
     fields:{
         type:mongoose.Schema.Types.ObjectId,
         ref:"Field",
@@ -61,10 +59,32 @@ const offerSchema= mongoose.Schema({
     }],
     comments:[{
         type:mongoose.Schema.Types.ObjectId,
-        ref:"Comments"
+        ref:'Comments'
         
-    }]
-        
+    }],
+    user:{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:'User'
+
+    },  
+    likedBy:{
+        type:Array
+    },
+    dislekedBy:{
+        type:Array
+    },
+    likes:{
+        type:Number,
+        default:0
+
+    },
+    dislikes:{
+        type:Number,
+        default:0
+    }
+    
+    
+
     
 
 });

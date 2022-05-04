@@ -6,6 +6,8 @@ require('dotenv').config()
 const Condidat = require('../models/candidat.models')
 const Company  = require('../models/companyRes.models')
 const crypto = require('crypto')
+const {google}=require('googleapis')
+const OAuth2=google.auth.OAuth2
 const { registerValidation, loginValidation } = require('../validation')
 
 
@@ -116,6 +118,113 @@ exports.login = async (req, res) => {
 
 
 }
+exports.forgetPassword=(req,res)=>{
+    const {email}=req.body;
+    let errors=[]
+    if(!email){
+        errors.path({msg:'Please enter an email ID'})
+    }
+    if(errors.length>0){
+        res.send({errors,email})
+    }
+    else{
+        User.findOne({email:email}).then(user=>{
+            if(!user){
+                errors.push({msg:'User with Email Id does not exist !'})
+                res.send({errors,email})
+            }
+            else{
+                const oauth2Client = new OAuth2(
+                    "173872994719-pvsnau5mbj47h0c6ea6ojrl7gjqq1908.apps.googleusercontent.com", // ClientID
+                    "OKXIYR14wBB_zumf30EC__iJ", 
+                    "https://developers.google.com/oauthplayground"
 
+                )
+                oauth2Client.setCredentials({
+                    refresh_token: "1//04T_nqlj9UVrVCgYIARAAGAQSNwF-L9IrGm-NOdEKBOakzMn1cbbCHgg2ivkad3Q_hMyBkSQen0b5ABfR8kPR18aOoqhRrSlPm9w"
+                })
+                const accessToken=oauth2Client.getAccessToken()
+                const token=jwt.sign({_id:user._id},process.env.JWT_RESET_Key,{expiresIn:'30m'})
+                const CLIENT_URL='http://' + req.headers.host
+                const output= `<h2>Please click on below link to reset your account password</h2>
+                <p>${CLIENT_URL}/auth/forgot/${token}</p>
+                <p><b>NOTE: </b> The activation link expires in 30 minutes.</p> `;
+                User.updateOne({resetLink:token},(err,success)=>{
+                    if(err){
+                        errors.push({msg:'Error ressetting password!'})
+                    }
+                    else{
+                        const transporter=nodemailer.createTransport({
+                            service:'gmail',
+                            auth:{
+                                type:"OAUTH2",
+                                user: "nodejsa@gmail.com",
+                                clientId: "173872994719-pvsnau5mbj47h0c6ea6ojrl7gjqq1908.apps.googleusercontent.com",
+                                clientSecret: "OKXIYR14wBB_zumf30EC__iJ",
+                                refreshToken: "1//04T_nqlj9UVrVCgYIARAAGAQSNwF-L9IrGm-NOdEKBOakzMn1cbbCHgg2ivkad3Q_hMyBkSQen0b5ABfR8kPR18aOoqhRrSlPm9w",
+                                accessToken: accessToken
+                               
+                            }
 
+                        })
+                        const mailOptions={
+                            from: '"Auth Admin" <nodejsa@gmail.com>', 
+                            to: email, 
+                            subject: "Account Password Reset: NodeJS Auth ✔", 
+                            html: output,
+                            
+                        }
+                        transporter.sendMail(mailoOptions,(error,info)=>{
+                            if(error){
+                                console.log(error)
+                                req.flash('error_msg','Smething went wrong on our end. please try again')
+                            }
+                            else{
+                                console.log('Mail sent : %s',info.response);
+                                req.flash('success_msg','Password reset link sent to email ID.Please follow the instructions')
+                            }
+                        })
+                    }
+                })
+            }
+        })
+    }
+}
+exports.resetPassword=(req,res)=>{
+    var {password,password2}=req.body
+    const id=req.params.id
+    let errors=[]
+    if(password || !password2){
+        req.flash('error_msg','Please enter all fields')
+    }else if(password.length<8){
+        req.flash('error_msg',
+        'Password must be at least 8 characters')
+    } else if (password!=password2){
+        req.flash('error_msg','Passwords do not match')
+    }
+    else{
+        bcrypt.genSalt(10,(err,salt)=>{
+            bcrypt.hash(password,salt,(err,hash)=>{
+                if(err) throw err;
+                password=hash
+                User.findByIdAndUpdate({_id:id},
+                    {password},
+                    function(err,result){
+                        if(err){
+                            req.flash('error_msg','Error resetting password!')
+                        }else{
+                            req.flash('success_msg',
+                            'Password reset successfully!')
+                        }
+                    })
+            })
+        })
+    }
+
+}
+exports.logout=(req,res,next)=>{
+    req.logout()
+    req.flash('success_msg','Youa are logged out')
+
+}
 

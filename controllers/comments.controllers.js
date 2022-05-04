@@ -1,20 +1,31 @@
-const express=require('express')
+
 const Comments = require('../models/comments.models')
+const Offer= require ('../models/jobOffer.models')
 exports.createCom= async(req,res)=>{
     if(!req.body){
         return res.status(400).send({message:"Error occured"})
     }
+    if(req.user){
+    Offer.findById(req.body.id).then(offer=>{
     const coments= new Comments({
         id:req.body.id,
         content:req.body.content,
         offer:req.body.offer
-        
-
     });
-     await coments.save().then(data=>{res.send(data)})
+
+     offer.comments.push(coments)
+     offer.save().then(data=>{
+         comments.save().then(savedComment=>{
+         
+        res.send(data)})
     .catch(err=>{res.status(500).send({message:err.message || "something is wrong"})})
-    
-};
+})
+    })
+}
+}
+
+
+
 exports.findAllComs=(req,res)=>{
     Comments.find().then(comment=>{
         res.send(comment);

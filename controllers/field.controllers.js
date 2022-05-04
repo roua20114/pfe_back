@@ -16,7 +16,7 @@ exports.create= async(req,res)=>{
     
 };
 exports.findAllField=(req,res)=>{
-    Field.find().then(fields=>{
+    Field.find().populate('jobOffers').then(fields=>{
         res.send(fields);
     }).catch(err=>{
         res.status(500).send({message:"error"})
@@ -73,6 +73,7 @@ exports.update=(req,res)=>{
 
     })
 
-    }
+}
+
 
 

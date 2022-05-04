@@ -1,7 +1,12 @@
+
 const mongoose= require("mongoose");
 const user=require('../models/user.models')
 
 const candidatSchema= mongoose.Schema({
+    image:{
+        type:String
+
+    },
    
     description:{
         type: String,

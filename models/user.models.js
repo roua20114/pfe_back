@@ -44,8 +44,16 @@ const UserSchema= new mongoose.Schema({
     emailToken:{
         type:String
     },
+    resetLink: {
+        type: String,
+        default: ''
+      },
+      pdp:{
+          type:string
+      }
   
 },
+
     {timestamps:true}
     
 

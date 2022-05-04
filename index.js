@@ -4,6 +4,12 @@ const authRoute=require('./routes/auth')
 const mongoose=require('mongoose')
 const dotenv=require('dotenv')
 const bodyParser=require('body-parser')
+const fileUpload=require('express-fileupload')
+let http=require('http')
+let server = http.Server(app)
+let socketIO=require('socket.io')
+let io=socketIO(server)
+
 
 
 const cors= require('cors')
@@ -21,6 +27,7 @@ const contractRoutes=require('./routes/contract.routes');
 const resRoutes=require('./routes/res.routes');
 const candiRoutes=require('./routes/candidacy.routes');
 const candidatRoutes=require('./routes/candidat.routes');
+const { use } = require('./routes/field.routes')
 dotenv.config()
 mongoose.connect(process.env.DB_CONNECT,{useNewUrlParser:true},()=>{
     console.log('connected')
@@ -52,7 +59,7 @@ app.use('/api/test',testRoutes);
 app.use('/api/trainings', trainingRoutes);
 app.use('/api/msg', msgRoutes);
 app.use('/api/question', questionsRoutes);
-
+app.use(fileUpload());
 
 
 app.use('/api/exp', expRoutes);
@@ -62,3 +69,22 @@ app.use('/api/res', resRoutes);
 app.use('/api/candidacy', candiRoutes);
 
 app.listen(5000, ()=>console.log('surver runing'))
+io.on('connection', (socket) => {
+    socket.on('join', (data) => {
+        socket.join(data.room);
+        socket.broadcast.to(data.room).emit('user joined');
+    });
+socket.on('message', (data) => {
+    io.in(data.room).emit('new message', {user: data.user, message: data.message});
+});
+});
+
+
+   
+
+
+    
+
+
+     
+   
