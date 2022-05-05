@@ -1,72 +1,76 @@
 
 
 const string = require('@hapi/joi/lib/types/string');
-const mongoose=require('mongoose');
+const mongoose = require('mongoose');
 
 
 
 
-const UserSchema= new mongoose.Schema({
-    
-    password:{
+const UserSchema = new mongoose.Schema({
+
+    password: {
         type: String,
-        required: [true,'Please enter a password'],
-        
+        required: [true, 'Please enter a password'],
+
         minlength: [5, 'Minimum password length is 6 characters']
-        
+
     },
-    email:{
+    email: {
         type: String,
         required: [true, 'Please enter an email'],
         unique: true,
         lowercase: true,
-        trim:true,
-       
-        
+        trim: true,
+
+
     },
-    username:{
-        type:String,
+    username: {
+        type: String,
         required: true,
-        trim:true,
-        unique:true,
-        index:true,
-        lowercase:true,
+        trim: true,
+        unique: true,
+        index: true,
+        lowercase: true,
     },
-   role:{
-        type:String,
-       
-     
+    role: {
+        type: String,
+
+
     },
-    verified:{
-        type:Boolean,
-        default : false
+    verified: {
+        type: Boolean,
+        default: false
     },
-    emailToken:{
-        type:String
+    emailToken: {
+        type: String
     },
     resetLink: {
         type: String,
         default: ''
-      },
-      pdp:{
-          type:string
-      }
-  
+    },
+    pdp: {
+        type: string
+    },
+    visited: {
+        type: Number,
+        default: 0
+    }
+
 },
 
-    {timestamps:true}
-    
+    { timestamps: true }
+
 
 );
 
 
 
 
-   
 
 
 
-      
+
+
 const User = mongoose.model('User', UserSchema);
 module.exports = User;
 
