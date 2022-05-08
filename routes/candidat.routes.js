@@ -3,6 +3,7 @@ const router=express.Router();
 const candidatCtr=require('../controllers/candidat.controllers');
 
 
+
 router.get("/getall",candidatCtr.getall)
 
 router.get("/getbyid/:id",candidatCtr.getbyid)

@@ -9,40 +9,53 @@ const { isEmpty } = require("../config/custom.config");
 
 
 exports.add = async (req, res) => {
-    if (!req.body) {
-        return res.status(400).send({ message: "Error occured" })
+    try{  
+        const offer = new Offer(req.body)
+        await offer.save(req.body,(err,item)=>{
+        if(err){
+            res.status(406).json({success:false, message:"failed creation", data:null})
+        }
+        else{
+            Field.findByIdAndUpdate(req.body.fields,{
+                $push:{offers:offer}},()=>{
+                    offer.populate({path:"fields", select:"name" },()=>{
+                        res.status(201).json({success:true,message:"creaed successfully", data:item})
+
+                    })
+
+                })
+            }
+        })
+    }catch(err){
+        res.status(500).json({error:err})
     }
     
-    const offer = new Offer({
-        title: req.body.title,
-        description: req.body.description,
-        qualifications: req.body.qualifications,
-        expirationDate: req.body.expirationDate,
-        jobType: req.body.jobType,
-        region: req.body.region,
-        technologiesReq: req.body.technologiesReq,
-        diplomaReq: req.body.diplomaReq,
-        placesAvai: req.body.placesAvai,
-        fields: req.body.fields,
-        user:user.username
+
+    
+  
+       
+
+       
        
        
 
-    });
-    await offer.save().then(data => { res.send(data) })
-        .catch(err => { res.status(500).send({ message: err.message || "something is wrong" }) })
-};
+
+   
+
+    }
+        
+;
 exports.findAllOffers = (req, res) => {
 
    
 
     Offer.find()
-    .populate('fields')
+  
     .then(offers => {
         res.send(offers);
     }).catch(err => {
         res.status(500).send({ message: "error" })
-    }).sort({'_id':-1})
+    })
 
 
 }

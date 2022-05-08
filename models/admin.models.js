@@ -1,12 +1,13 @@
 
 
-const string = require('@hapi/joi/lib/types/string');
+
 const mongoose = require('mongoose');
+const user=require('../models/user.models')
 
 
 
 
-const UserSchema = new mongoose.Schema({
+const adminSchema= new mongoose.Schema({
 
     password: {
         type: String,
@@ -47,7 +48,7 @@ const UserSchema = new mongoose.Schema({
         default: ''
     },
     pdp: {
-        type: string
+        type: String
     },
     visited: {
         type: Number,
@@ -60,6 +61,7 @@ const UserSchema = new mongoose.Schema({
 
 
 );
+module.exports= user.discriminator("Admin",adminSchema)
 
 
 
@@ -69,7 +71,5 @@ const UserSchema = new mongoose.Schema({
 
 
 
-const User = mongoose.model('User', UserSchema);
-module.exports = User;
 
 

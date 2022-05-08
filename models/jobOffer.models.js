@@ -81,8 +81,8 @@ const offerSchema= mongoose.Schema({
     dislikes:{
         type:Number,
         default:0
-    }
-    
+    },
+   
     
 
     

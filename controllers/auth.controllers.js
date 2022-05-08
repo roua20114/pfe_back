@@ -9,6 +9,7 @@ const crypto = require('crypto')
 const { google } = require('googleapis')
 const OAuth2 = google.auth.OAuth2
 const { registerValidation, loginValidation } = require('../validation')
+const Admin=require('../models/admin.models')
 
 
 var transporter = nodemailer.createTransport({
@@ -45,17 +46,29 @@ exports.register = async (req, res) => {
 
         let user
         console.log(role);
-        if (role == 'condidat') {
+        if (role == 'candidat') {
 
             user = new Condidat(data)
 
             await user.save()
 
         } else {
+            if( role=='campany'){
+            
             user = new Company(data)
 
-            await user.save()
+            await user.save()}
+            else{
+                if(role=='admin'){
+                    user= new Admin(data)
+                    await user.save()
+                }
+            }
+            
+           
         }
+        
+        
 
         const token = await jwt.sign({ _id: user._id }, process.env.TOKEN_SECRET)
         var mailOptions = {
@@ -64,7 +77,7 @@ exports.register = async (req, res) => {
             subject: 'codewithsid _verify your email',
             html: `<h2>${user.username}! thanks for registerign on our site </h2>
                 <h4> Please verify your email to continue..</h4>
-                <a href="http://${req.headers.host}/api/user/verify-email?token=${token}"> verify your email</a>`
+                <a href="http://${req.headers.host}/api/auth/verify-email?token=${token}"> verify your email</a>`
         }
         transporter.sendMail(mailOptions, function (error, info) {
             if (error) {
@@ -75,7 +88,7 @@ exports.register = async (req, res) => {
 
             }
         })
-        res.send({ user: user._id })
+        res.send({ user: user })
 
     } catch (err) {
         console.log(err);
