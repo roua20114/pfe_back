@@ -11,20 +11,27 @@ exports.auth= (req,res,next)=>{
     }
 }
 exports.verifyToken=(req,res,next)=>{
-    if(!req.headers.authorization){
-        return res.status(401).send("unauthorized req")
+    let token = req.headers["authorization"];
+    console.log(token);
+    token = token.slice(7, token.length);
+    if (token) {
+      jwt.verify(token, process.env.TOKEN_SECRET, (err, decoded) => {
+        if (err) {
+          return res.json({
+            status: false,
+            msg: "token is invalid",
+          });
+        } else {
+          req.decoded = decoded;
+          next();
+        }
+      });
+    } else {
+      return res.json({
+        status: false,
+        msg: "Token is not provided",
+      });
     }
-    let token= res.headers.authorization.split(' ')[1]
-    if(token=='null'){
-        return res.status(401).send("unathorized req")
-    }
-    let payload= jwt.verify(token, process.env.TOKEN_SECRET)
-    if(!payload){
-        return res.status(401).send("unauthorized req")
-    }
-    req.userId= payload.subject;
-    req.email= payload.email
-    next()
 }
 
 

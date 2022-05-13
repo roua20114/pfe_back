@@ -16,15 +16,12 @@ const comentsSchema=mongoose.Schema({
         type:mongoose.Schema.Types.ObjectId,
         ref:"Candidat"
     },
-    user:{
+    company:{
         type:mongoose.Schema.Types.ObjectId,
-        ref:"User"
+        ref:"companyRes"
     },
 
-    commentIsApproved: {
-        type: Boolean,
-        default: false
-    }
+   
 });
    
    

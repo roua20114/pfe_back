@@ -9,6 +9,7 @@ let http=require('http')
 let server = http.Server(app)
 let socketIO=require('socket.io')
 let io=socketIO(server)
+const multer= require('multer')
 
 
 
@@ -33,9 +34,10 @@ mongoose.connect(process.env.DB_CONNECT,{useNewUrlParser:true},()=>{
     console.log('connected')
 })
 app.use((req, res, next) => {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content, Accept, Content-Type, Authorization','Auth-token','Token');
+    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:4200');
+    res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content, Accept, Content-Type, Authorization');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
+    res.setHeader('Access-Control-Allow-Credentials',true)
     next();
 });
 app.use(express.json());
@@ -43,7 +45,15 @@ app.use(bodyParser.urlencoded({extended:false}));
 app.use(bodyParser.json());
 app.use(cors())
 app.use(express.static(__dirname + '/public'));
-app.use('/uploads', express.static('uploads'));
+app.use(fileUpload());
+global.publicPath=__dirname+'/public';
+app.use(function(req, res, next){
+	global.req=req;
+	next();
+});
+
+
+
 
 app.use('/api/auth',authRoute)
 app.use('/api/user',userRoute)
@@ -66,7 +76,7 @@ app.use('/api/exp', expRoutes);
 app.use('/api/cv', cvRoutes);
 app.use('/api/contract', contractRoutes);
 app.use('/api/res', resRoutes);
-app.use('/api/candidacy', candiRoutes);
+app.use('/api/can', candiRoutes);
 
 app.listen(5000, ()=>console.log('surver runing'))
 io.on('connection', (socket) => {
@@ -78,6 +88,10 @@ socket.on('message', (data) => {
     io.in(data.room).emit('new message', {user: data.user, message: data.message});
 });
 });
+
+
+
+
 
 
    

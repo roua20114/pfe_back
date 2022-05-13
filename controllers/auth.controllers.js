@@ -1,9 +1,8 @@
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
-const User = require('../models/user.models')
 const nodemailer = require('nodemailer')
 require('dotenv').config()
-const Condidat = require('../models/candidat.models')
+const Candidat = require('../models/candidat.models')
 const Company = require('../models/companyRes.models')
 const crypto = require('crypto')
 const { google } = require('googleapis')
@@ -22,62 +21,33 @@ var transporter = nodemailer.createTransport({
         rejectUnauthorized: false
     }
 })
-exports.register = async (req, res) => {
+exports.registercCandidat = async (req, res) => {
+   
+    const ccandiat= await Candidat.findOne({email:req.body.email});
+    if(ccandiat){
+        return res.status(400).json({message:'email already exists '})
 
-    const { role } = req.body
-    /* 
-    const { error } = registerValidation(req.body);
-    if (error) return res.status(400).send(error.details[0].message)
- */
-
-    const emailExist = await User.findOne({ email: req.body.email })
-
-    if (emailExist) return res.status(400).json('Email already exists')
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(req.body.password, salt);
-
-
-    let data = {
-        ...req.body,
-        ['password']: hashedPassword
     }
+    const candidat=new Candidat(req.body)
+    const salty= await bcrypt.genSalt(10)
+    company.password=await bcrypt.hash(company.password,salty)
+ 
+    await candidat.save()
+    const tokenn = await jwt.sign({_id:candidat._id,candidat:candidat}, process.env.TOKEN_SECRET)
+    
+    // const { error } = registerValidation(req.body);
+    // if (error) return res.status(400).send(error.details[0].message)
+ 
+    
 
     try {
-
-        let user
-        console.log(role);
-        if (role == 'candidat') {
-
-            user = new Condidat(data)
-
-            await user.save()
-
-        } else {
-            if( role=='campany'){
-            
-            user = new Company(data)
-
-            await user.save()}
-            else{
-                if(role=='admin'){
-                    user= new Admin(data)
-                    await user.save()
-                }
-            }
-            
-           
-        }
-        
-        
-
-        const token = await jwt.sign({ _id: user._id }, process.env.TOKEN_SECRET)
         var mailOptions = {
             from: '" verify your email" <rouapfe@gmail.com>',
-            to: user.email,
+            to: candidat.email,
             subject: 'codewithsid _verify your email',
-            html: `<h2>${user.username}! thanks for registerign on our site </h2>
+            html: `<h2>${candidat.username}! thanks for registerign on our site </h2>
                 <h4> Please verify your email to continue..</h4>
-                <a href="http://${req.headers.host}/api/auth/verify-email?token=${token}"> verify your email</a>`
+                <a href="http://${req.headers.host}/api/auth/verify-email?token=${tokenn}"> verify your email</a>`
         }
         transporter.sendMail(mailOptions, function (error, info) {
             if (error) {
@@ -88,29 +58,33 @@ exports.register = async (req, res) => {
 
             }
         })
-        res.send({ user: user })
+        res.send({ candidat: candidat})
 
     } catch (err) {
         console.log(err);
         return res.status(400).send(err)
 
     }
+    
 }
 exports.verification = async (req, res) => {
 
     try {
         const token = req.query.token
         const decoded = jwt.verify(token, process.env.TOKEN_SECRET)
-        const user = await User.findByIdAndUpdate({ _id: decoded._id }, { verified: true })
-        /*  if (user) {
-             user.emailToken = null
-             user.verified = true
-             await user.save()
- 
-         }
-         else {
-             console.log('email is not verified')
-         } */
+        const company = await Company.findByIdAndUpdate({ _id: decoded._id }, { verified: true })
+        
+        res.send('acount successuly verified')
+    }
+    catch (err) {
+        console.log(err)
+        res.status(401).json('invalid token')
+    }
+    try {
+        const token = req.query.token
+        const decoded = jwt.verify(token, process.env.TOKEN_SECRET)
+        const candidat= await Candidat.findByIdAndUpdate({ _id: decoded._id }, { verified: true })
+        
         res.send('acount successuly verified')
     }
     catch (err) {
@@ -120,15 +94,48 @@ exports.verification = async (req, res) => {
 
 }
 exports.login = async (req, res) => {
-    const { error } = loginValidation(req.body);
-    if (error) return res.status(400).send(error.details[0].message);
-    const user = await User.findOne({ email: req.body.email })
-    if (!user) return res.status(400).send('Email or password is wrong')
-    const validPass = await bcrypt.compare(req.body.password, user.password)
-    if (!validPass) return res.status(400).send('Invalid password')
+    let company=await Company.findOne({email:req.body.email})
+    let admin= await Candidat.findOne({email:req.body.email})
+    let addmin= await Admin.findOne({email:req.body.email})
+    if(!admin && !company && !addmin ){
+        return res.status(400).json({message:'User not found :('})
+    
+    }
+    if(admin){
+        const check=await bcrypt.compare(req.body.password,admin.password)
+        if (!check){
+            return res.status(400).json({message:'Invalid Email or password'})
+        }
+        const token = jwt.sign({admin:{_id:admin._id,email:admin.email,role:admin.role}}, process.env.TOKEN_SECRET)
+        return res.header('auth-token', token).send({token:token,admin:admin});
+        
+    }
+    if(company){
+        const check=await bcrypt.compare(req.body.password,company.password)
+        if(!check){
+            return res.status(400).json({
+                meesage:"Invalid Email or Password "
+            })
+        }
+        const token = jwt.sign({admin:{_id:company._id,email:company.email,role:company.role}}, process.env.TOKEN_SECRET)
+        return res.header('auth-token', token).send({token:token,admin:company});
+    }
+    if(addmin){
+        const check=await bcrypt.compare(req.body.password,addmin.password)
+        if(!check){
+            return res.status(400).json({
+                meesage:"Invalid Email or Password "
+            })
+        }
+        const token = jwt.sign({admin:{_id:addmin._id,email:addmin.email,role:addmin.role}}, process.env.TOKEN_SECRET)
+        return res.header('auth-token', token).send({token:token,admin:addmin});
+    }
+    // const { error } = loginValidation(req.body);
+    // if (error) return res.status(400).send(error.details[0].message);
+    
 
-    const token = jwt.sign({ _id: user._id, role: user.__t }, process.env.TOKEN_SECRET)
-    return res.header('auth-token', token).send(token);
+    
+    
 
 
 }
@@ -240,5 +247,65 @@ exports.logout = (req, res, next) => {
     req.logout()
     req.flash('success_msg', 'Youa are logged out')
 
+}
+exports.registerAdmin=async(req,res)=>{
+    const aadmin= await Admin.findOne({email:req.body.email});
+    if(aadmin){
+        return res.status(400).json({message:'email already exists '})
+
+    }
+    const admin=new Admin(req.body)
+    const salt= await bcrypt.genSalt(10)
+    admin.password=await bcrypt.hash(admin.password,salt)
+    admin.role="admin";
+    await admin.save()
+    const token = await jwt.sign({ admin:{_id:admin._id,admin:admin} }, process.env.TOKEN_SECRET)
+    res.header("x-auth-token",token).send({admin:admin,token:token})
+
+}
+exports.registerCompany=async(req,res)=>{
+    const ccompany= await Company.findOne({email:req.body.email});
+    if(ccompany){
+        return res.status(400).json({message:'email already exists '})
+
+    }
+    const company=new Company(req.body)
+    const salt= await bcrypt.genSalt(10)
+    const hash=await bcrypt.hash(company.password,salt)
+    this.password=hash
+ 
+    await company.save()
+    const token = await jwt.sign({_id:company._id,company:company}, process.env.TOKEN_SECRET)
+    
+    // const { error } = registerValidation(req.body);
+    // if (error) return res.status(400).send(error.details[0].message)
+ 
+    
+
+    try {
+        var mailOptions = {
+            from: '" verify your email" <rouapfe@gmail.com>',
+            to: company.email,
+            subject: 'codewithsid _verify your email',
+            html: `<h2>${company.username}! thanks for registerign on our site </h2>
+                <h4> Please verify your email to continue..</h4>
+                <a href="http://${req.headers.host}/api/auth/verify-email?token=${token}"> verify your email</a>`
+        }
+        transporter.sendMail(mailOptions, function (error, info) {
+            if (error) {
+                console.log(error)
+            }
+            else {
+                console.log('verification email is sent to your gmail account')
+
+            }
+        })
+        res.send({ company: company})
+
+    } catch (err) {
+        console.log(err);
+        return res.status(400).send(err)
+
+    }
 }
 

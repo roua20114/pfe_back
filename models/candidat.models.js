@@ -1,11 +1,20 @@
 
+const string = require("@hapi/joi/lib/types/string");
 const mongoose= require("mongoose");
-const user=require('../models/user.models')
+
 
 const candidatSchema= mongoose.Schema({
     image:{
         type:String
 
+    },
+    name:{
+        type:string,
+        required:true
+    },
+    surname:{
+        type:string,
+        required:true
     },
    
     description:{
@@ -29,14 +38,67 @@ const candidatSchema= mongoose.Schema({
         type:Date,
         required: true
     },
+    password: {
+        type: String,
+        required: true
+
+    },
+    email: {
+        type: String,
+        required: true,
+        unique: true,
+        lowercase: true,
+        trim: true,
+
+
+    },
+    username: {
+        type: String,
+        required: true,
+        trim: true,
+        unique: true,
+        index: true,
+        lowercase: true,
+    },
+    role: {
+        type: String,
+        default:"company"
+
+
+    },
+    verified: {
+        type: Boolean,
+        default: false
+    },
+   
+    resetLink: {
+        type: String,
+        default: ''
+    },
+    pdp: {
+        type: String
+    },
+    visited: {
+        type: Number,
+        default: 0
+    },
+    tel:{
+        type:Number
+    },
+
     comment:[{
         type:mongoose.Schema.Types.ObjectId,
         ref:'Comments'
+    }],
+    candidature:[{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:'Candidacy'
     }]
    
   
     
 
-});
+},
+{ timestamps: true });
 
-module.exports= user.discriminator("Candidat",candidatSchema)
+module.exports= mongoose.model("Candidat",candidatSchema)

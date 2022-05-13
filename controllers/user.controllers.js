@@ -1,46 +1,91 @@
-const User = require('../models/user.models')
+const Candidat = require('../models/candidat.models')
+const bcrypt=require('bcryptjs')
+const Company=require('../models/companyRes.models')
 
 
 
 exports.myprofile = (req, res) => {
-    User.findOne({ _id: req.user._id }, (error, user) => {
+    Candidat.findOne({ _id: req.candidat._id }, (error, candidat) => {
         if (error) {
             console.log("something went wrong !!")
             res.json({ errormsg: "something went wrong" })
         }
         else {
-            res.status(200).json({ user: user, msg: "all ok from myProfile" })
+            res.status(200).json({ candidat: candidat, msg: "all ok from myProfile" })
         }
     }).select("-password")
 
 }
-exports.editProfile = (req, res) => {
-    let emailchange
-    if (req.email == req.body.email) {
-        emailchange = "no"
-    }
-    else {
-        emailchange = "yes"
-    }
-    User.updateOne({ _id: req.userId }, {
-        username: req.body.username,
-        email: req.body.email,
-
-    }, function (err, user) {
-        if (err) {
-            console.log("something  went wrong !!")
-            res.json({ errormsg: "something went wrong!!" })
+exports.myprofileCompany = (req, res) => {
+    Company.findOne({ _id: req.companyRes._id }, (error, companyRes) => {
+        if (error) {
+            console.log("something went wrong !!")
+            res.json({ errormsg: "something went wrong" })
         }
         else {
-            console.log("something went wrong!!")
-            res.status(201).json({ msg: "edited profile", emailchange: emailchange })
+            res.status(200).json({ companyRes: companyRes, msg: "all ok from myProfile" })
         }
-    })
+    }).select("-password")
+
+}
+exports.editProfileCandidat= async (req, res) => {
+   if(req.body.candidatId===req.params.id){
+        if(req.body.password){
+            try{
+                const salt = await bcrypt.genSalt(10)
+                req.body.password= await bcrypt.hash(req.body.password,salt)
+            }catch(err){
+                return res.status(500).json(err)
+            }
+        }
+            try{
+                const candidat=await Candidat.findByIdAndUpdate(req.params.id,{
+                    $set:req.body
+                })
+                res.status(200).json("Account has been updated")
+            }catch(err){
+                return res.status(500).json(err)
+            }
+   }
+        
+    
+        else{
+            return res.status(403).json("You can update only your account")
+
+        }
+ }
+   
+
+
+exports.editProfileCompany=async(req,res)=>{
+    if(req.body.companyId===req.params.id){
+        if(req.body.password){
+            try{
+                const salt = await bcrypt.genSalt(10)
+                req.body.password= await bcrypt.hash(req.body.password,salt)
+            }catch(err){
+                return res.status(500).json(err)
+            }
+            try{
+                const company=await Company.findByIdAndUpdate(req.params.id,{
+                    $set:req.body
+                })
+                res.status(200).json("Account has been updated")
+            }catch(err){
+                return res.status(500).json(err)
+            }
+        }else{
+            return res.status(403).json("You can update only your account")
+
+        }
+    }
+
+
 }
 
 exports.visited = (req, res) => {
 
-    User.findByIdAndUpdate({ _id: req.params.id }, { $inc: { 'visited': 1 } }, { new: true }, (err, user) => {
+    Candidat.findByIdAndUpdate({ _id: req.params.id }, { $inc: { 'visited': 1 } }, { new: true }, (err, user) => {
         if (err) {
             res.status(500).json('error increment provile views')
         } else {
@@ -77,3 +122,34 @@ exports.getMostVisitedProfiles = async (req, res) => {
     })
 
 }
+exports.deleteCandidat=async(req,res)=>{
+    if(req.body.candidatId===req.params.id){
+        try{
+            const candidat= await Candidat.findByIdAndDelete(req.params.id)
+               res.status(200).json("account has been deleted")
+        }catch(err){
+            return res.status(500).json(err)
+        }
+    }
+        else{
+            return res.status(403).json("You can only delete your account")
+        }
+     
+
+    }
+    exports.deleteCompany=async(req,res)=>{
+        if(req.body.companyId===req.params.id){
+            try{
+                const company= await Commpany.findByIdAndDelete(req.params.id)
+                   res.status(200).json("account has been deleted")
+            }catch(err){
+                return res.status(500).json(err)
+            }
+        }
+            else{
+                return res.status(403).json("You can only delete your account")
+            }
+         
+    
+        }
+    

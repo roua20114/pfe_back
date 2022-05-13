@@ -1,3 +1,4 @@
+const string = require("@hapi/joi/lib/types/string");
 const mongoose= require("mongoose");
 
 const offerSchema= mongoose.Schema({
@@ -17,10 +18,7 @@ const offerSchema= mongoose.Schema({
         type: Date,
        
     },
-    creationDate:{
-        type: Date,
-        default:Date.now()
-    },
+    
     jobType:{
         type: String,
         required: true
@@ -42,6 +40,12 @@ const offerSchema= mongoose.Schema({
         type: Number,
         required: true
     },
+    image:{
+        type:String
+    },
+    username:{
+        type:String
+    },
     
     fields:{
         type:mongoose.Schema.Types.ObjectId,
@@ -50,42 +54,32 @@ const offerSchema= mongoose.Schema({
     },
     candidacy:[{
         type:mongoose.Schema.Types.ObjectId,
-        ref:"Offer"
+        ref:"Candidacy"
 
     }],
-    company:[{
+    company:{
         type:mongoose.Schema.Types.ObjectId,
         ref:"CompanyRes"
-    }],
+    },
     comments:[{
         type:mongoose.Schema.Types.ObjectId,
         ref:'Comments'
         
     }],
-    user:{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:'User'
+    created_at:{
+        type:string
+    }
 
-    },  
-    likedBy:{
-        type:Array
-    },
-    dislekedBy:{
-        type:Array
-    },
-    likes:{
-        type:Number,
-        default:0
-
-    },
-    dislikes:{
-        type:Number,
-        default:0
-    },
+   
+   
    
     
 
     
 
 });
+offerSchema.virtual('image_url').get(function(){
+    var fullUrl=req.protocol +'://' + req.get('host')
+    return fullUrl+'/uploads/blog_images/'+this.image
+})
 module.exports=mongoose.model('Offer', offerSchema);

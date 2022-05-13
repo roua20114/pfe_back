@@ -2,7 +2,7 @@
 
 
 const mongoose = require('mongoose');
-const user=require('../models/user.models')
+
 
 
 
@@ -11,14 +11,12 @@ const adminSchema= new mongoose.Schema({
 
     password: {
         type: String,
-        required: [true, 'Please enter a password'],
-
-        minlength: [5, 'Minimum password length is 6 characters']
+        required: true
 
     },
     email: {
         type: String,
-        required: [true, 'Please enter an email'],
+        required: true,
         unique: true,
         lowercase: true,
         trim: true,
@@ -35,25 +33,16 @@ const adminSchema= new mongoose.Schema({
     },
     role: {
         type: String,
+        default:"admin"
 
 
-    },
-    verified: {
-        type: Boolean,
-        default: false
     },
    
-    resetLink: {
-        type: String,
-        default: ''
-    },
+  
     pdp: {
         type: String
     },
-    visited: {
-        type: Number,
-        default: 0
-    }
+   
 
 },
 
@@ -61,7 +50,7 @@ const adminSchema= new mongoose.Schema({
 
 
 );
-module.exports= user.discriminator("Admin",adminSchema)
+module.exports= mongoose.model("Admin",adminSchema)
 
 
 
