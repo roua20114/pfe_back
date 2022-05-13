@@ -265,20 +265,19 @@ exports.registerAdmin=async(req,res)=>{
 }
 exports.registerCompany=async(req,res)=>{
     const ccompany= await Company.findOne({email:req.body.email});
+    
     if(ccompany){
         return res.status(400).json({message:'email already exists '})
-
+        
     }
+
     const company=new Company(req.body)
-    const salt= await bcrypt.genSalt(10)
-    const hash=await bcrypt.hash(company.password,salt)
-    this.password=hash
- 
-    await company.save()
+     const salt= await bcrypt.genSalt(10)
+     const hash=await bcrypt.hash(company.password,salt)
+     company.password=hash
+     await company.save()
     const token = await jwt.sign({_id:company._id,company:company}, process.env.TOKEN_SECRET)
     
-    // const { error } = registerValidation(req.body);
-    // if (error) return res.status(400).send(error.details[0].message)
  
     
 
@@ -300,12 +299,13 @@ exports.registerCompany=async(req,res)=>{
 
             }
         })
-        res.send({ company: company})
 
     } catch (err) {
         console.log(err);
         return res.status(400).send(err)
 
     }
+    res.header('auth-token', token).send({ company: company,token:token})
+
 }
 

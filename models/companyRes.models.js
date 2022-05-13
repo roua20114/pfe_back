@@ -3,51 +3,41 @@ const mongoose= require("mongoose");
 
 const companyResSchema= mongoose.Schema({
     companyName:{
-        type: String,
-        required: true
+        type: String
     },
     companyAddress:{
-        type: String,
-        required: true
+        type: String
     },
     webSite:{
         type:String
     },
     description:{
-        type: String,
-        required: true
+        type: String
     },
     creationDate:{
-        type:Date,
-        required: true
+        type:Date
     },
     logo :{
         type: String
     },
     region:{
-        type: String,
-        required: true 
+        type: String 
     },
     sector:{
-        type: String,
-        required: true
+        type: String
     },
     tel:{
-        type: Number,
-        required: true
+        type: Number
     },
     type:{
-        type: String,
-        required: true
+        type: String
     },
     password: {
-        type: String,
-        required: true
+        type: String
 
     },
     email: {
         type: String,
-        required: true,
         unique: true,
         lowercase: true,
         trim: true,
@@ -56,7 +46,6 @@ const companyResSchema= mongoose.Schema({
     },
     username: {
         type: String,
-        required: true,
         trim: true,
         unique: true,
         index: true,

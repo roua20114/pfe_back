@@ -30,9 +30,10 @@ const candiRoutes=require('./routes/candidacy.routes');
 const candidatRoutes=require('./routes/candidat.routes');
 const { use } = require('./routes/field.routes')
 dotenv.config()
-mongoose.connect(process.env.DB_CONNECT,{useNewUrlParser:true},()=>{
-    console.log('connected')
-})
+mongoose.connect(process.env.DB_CONNECT, { useNewUrlParser: true, useUnifiedTopology: true} ,(err) => {
+    if(err) console.log(err) 
+    else console.log("mongdb is connected");
+   })
 app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', 'http://localhost:4200');
     res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content, Accept, Content-Type, Authorization');
