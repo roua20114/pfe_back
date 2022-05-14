@@ -286,7 +286,7 @@ exports.registerCompany=async(req,res)=>{
             from: '" verify your email" <rouapfe@gmail.com>',
             to: company.email,
             subject: 'codewithsid _verify your email',
-            html: `<h2>${company.username}! thanks for registerign on our site </h2>
+            html: `<h2>${company.companyName}! thanks for registerign on our site </h2>
                 <h4> Please verify your email to continue..</h4>
                 <a href="http://${req.headers.host}/api/auth/verify-email?token=${token}"> verify your email</a>`
         }

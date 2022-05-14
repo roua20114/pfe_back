@@ -80,15 +80,6 @@ app.use('/api/res', resRoutes);
 app.use('/api/can', candiRoutes);
 
 app.listen(5000, ()=>console.log('surver runing'))
-io.on('connection', (socket) => {
-    socket.on('join', (data) => {
-        socket.join(data.room);
-        socket.broadcast.to(data.room).emit('user joined');
-    });
-socket.on('message', (data) => {
-    io.in(data.room).emit('new message', {user: data.user, message: data.message});
-});
-});
 
 
 

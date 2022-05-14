@@ -43,9 +43,7 @@ const offerSchema= mongoose.Schema({
     image:{
         type:String
     },
-    username:{
-        type:String
-    },
+    
     
     fields:{
         type:mongoose.Schema.Types.ObjectId,
