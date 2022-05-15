@@ -1,6 +1,5 @@
 const string = require("@hapi/joi/lib/types/string");
 const mongoose= require("mongoose");
-
 const offerSchema= mongoose.Schema({
     title:{
         type:String,

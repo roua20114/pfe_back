@@ -12,7 +12,7 @@ const { default: mongoose } = require("mongoose");
 
 exports.add = async (req, res) => {
     const blogpost = Offer({
-        username:req.decoded.username,
+        username:req.decoded.admin._id,
          fields:req.body.fields,
         title:req.body.title,
          description:req.body.description,
@@ -24,13 +24,14 @@ exports.add = async (req, res) => {
         region:req.body.region,
         // image:image_file_name
       });
+	  
       blogpost
         .save()
         .then((result) => {
-          res.json({ data: result["_id"] });
+          res.json({ data: result["_id"],message:"success" });
         })
         .catch((err) => {
-          console.log(err), res.json({ err: err });
+          console.log(err), res.json({ err: err ,message:"failed"});
         });
 }
     

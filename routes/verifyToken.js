@@ -13,7 +13,9 @@ exports.auth= (req,res,next)=>{
 exports.verifyToken=(req,res,next)=>{
     let token = req.headers["authorization"];
     console.log(token);
-    token = token.slice(7, token.length);
+    token = token.slice(6, token.length);
+    console.log(token);
+
     if (token) {
       jwt.verify(token, process.env.TOKEN_SECRET, (err, decoded) => {
         if (err) {
